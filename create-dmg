@@ -149,9 +149,13 @@ fi
 # Create the image
 echo "Creating disk image..."
 test -f "${DMG_TEMP_NAME}" && rm -f "${DMG_TEMP_NAME}"
-ACTUAL_SIZE=`du -sm "$SRC_FOLDER" | sed -e 's/	.*//g'`
-DISK_IMAGE_SIZE=$(expr $ACTUAL_SIZE + 20)
-hdiutil create -srcfolder "$SRC_FOLDER" -volname "${VOLUME_NAME}" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW -size ${DISK_IMAGE_SIZE}m "${DMG_TEMP_NAME}"
+hdiutil create -srcfolder "$SRC_FOLDER" -volname "${VOLUME_NAME}" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW "${DMG_TEMP_NAME}"
+
+# increase size of the image
+echo "Increasing size of disk image..."
+DMG_SIZE=`du -sm "$DMG_TEMP_NAME" | sed -e 's/	.*//g'`
+NEW_SIZE=$(expr $DMG_SIZE + 20)
+hdiutil resize -growonly -size ${NEW_SIZE}m $DMG_TEMP_NAME
 
 # mount it
 echo "Mounting disk image..."
